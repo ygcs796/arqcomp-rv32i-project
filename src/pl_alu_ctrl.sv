@@ -28,14 +28,19 @@ module pl_alu_ctrl (
 
             2'b01: Operation = 4'd02;   // Branch BEQ  -> SUB
 
-            2'b10: begin                // R-type: decodificar Funct
+            2'b10: begin                // R-type e I-type: decodificar Funct
                 case (Funct3)
-                    3'h0: Operation = Funct7[5] ? 4'd02 : 4'd01; // SUB ou ADD
-                    3'h6: Operation = 4'd04;  // OR
-                    3'h7: Operation = 4'd05;  // AND
-                    3'h2: Operation = 4'd11;  // SLT
+                    3'h0: Operation = Funct7[5] ? 4'd02 : 4'd01; // SUB ou ADD (e suas versões imediatas)
+                    3'h6: Operation = 4'd04;    //OR (e sua versão imediata)
+                    3'h7: Operation = 4'd05;    //AND (e sua versão imediata)
+                    3'h4: Operation = 4'd06;    //XOR (e sua versão imediata)
+                    3'h1: Operation = 4'd07;    //SLL (e sua versão imediata)
+                    3'h5: Operation = Funct7[5] ? 4'd09 : 4'd08; //SRA ou SRL (e suas versões imediatas)
+                    3'h3: Operation = 4'd10;    //SLTU (e sua versão imediata)
+                    3'h2: Operation = 4'd11;    // SLT (e sua versão imediata)
                     default: Operation = 4'd01;
                 endcase
+                
             end
 
             default: Operation = 4'd01;

@@ -38,6 +38,7 @@ module pl_control (
 );
 
     localparam R_TYPE = 7'b0110011;
+    localparam ARLOGIMM   = 7'b0010011;
     localparam LOAD   = 7'b0000011;
     localparam STORE  = 7'b0100011;
     localparam BRANCH = 7'b1100011;
@@ -57,6 +58,12 @@ module pl_control (
                 MemtoReg = 1'b0;
                 RegWrite = 1'b1;
                 ALUOp    = 2'b10;
+            end
+            ARLOGIMM: begin
+                ALUSrc   = 1'b1;
+                MemtoReg = 1'b0;
+                RegWrite = 1'b1;
+                ALUOp    = 2'10;
             end
             LOAD: begin
                 ALUSrc   = 1'b1;
