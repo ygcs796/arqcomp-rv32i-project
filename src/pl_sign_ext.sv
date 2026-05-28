@@ -16,14 +16,14 @@ module pl_sign_ext (
     output logic [31:0] ImmExt
 );
 
-    localparam ARLOG   = 7'b0010011; // Tirando o LOAD
+    localparam ARLOG  = 7'b0010011; // Tirando o LOAD
     localparam LOAD   = 7'b0000011;
     localparam STORE  = 7'b0100011;
     localparam BRANCH = 7'b1100011;
 
     always_comb begin
         case (Instr[6:0])
-            ARLOG:    ImmExt = {{20{Instr[31]}}, Instr[31:20]};
+            ARLOG:  ImmExt = {{20{Instr[31]}}, Instr[31:20]};
             
             LOAD:   ImmExt = {{20{Instr[31]}}, Instr[31:20]};
 
