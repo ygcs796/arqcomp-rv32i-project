@@ -7,6 +7,11 @@
 //   4'd02 : SUB  -- subtracao com sinal  (BEQ usa Zero)
 //   4'd04 : OR   -- OU bit a bit
 //   4'd05 : AND  -- E bit a bit
+//   4'd06 : XOR  -- OU EXCLUSIVO bit a bit
+//   4'd07 : SLL  -- SHIFT LEFT LOGICAL
+//   4'd08 : SRL  -- SHIFT RIGHT LOGICAL
+//   4'd09 : SRA  -- SHIFT RIGHT ARITHMETICAL
+//   4'd10 : SLTU  -- SET-LESS-THAN sem sinal
 //   4'd11 : SLT  -- set-less-than com sinal
 // =============================================================================
 
