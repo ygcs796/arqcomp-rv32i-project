@@ -533,7 +533,7 @@ def translate_instruction(instruction):
 			shamt = sfill(sbin(shamt)[0:6], 5)
 
 			shamt = instruction.split(" ")[1].split(",")[2]
-		    shamt = bin(int(shamt))[2:].zfill(5) # ao tratar o deslocamento como um binário sem sinal, evita que a variável fique com bits a mais do que deveria
+			shamt = bin(int(shamt))[2:].zfill(5) # ao tratar o deslocamento como um binário sem sinal, evita que a variável fique com bits a mais do que deveria
 
 			binary = funct7 + shamt + rs1 + funct3 + rd + opcode
 
