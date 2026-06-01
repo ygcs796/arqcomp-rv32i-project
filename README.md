@@ -52,7 +52,7 @@ Processador RISC-V de 32 bits com pipeline de 5 estágios implementado em System
 | 4 | `SLTI`    | I    | 0010011 | ✅ |
 | 5 | `SLLI`    | I    | 0010011 | ✅ |
 | 6 | `SRLI`    | I    | 0010011 | ✅ |
-| 7 | `SRAI`    | I    | 0010011 | ❌ |
+| 7 | `SRAI`    | I    | 0010011 | ✅ |
 
 ### Instruções a implementar — Etapa 02
 
