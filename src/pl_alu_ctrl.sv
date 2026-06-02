@@ -38,7 +38,7 @@ module pl_alu_ctrl (
                 endcase
             end//Operation = 4'd02;   // Branch BEQ  -> SUB
 
-            2'b10, 2'b11: begin                // R-type e I-type: decodificar Funct
+            2'b10: begin                // R-type e I-type: decodificar Funct
                 case (Funct3)
                     3'h0: Operation = Funct7[5] && !(ALUOp[0]) ? 4'd02 : 4'd01; // SUB ou ADD (e suas versões imediatas)
                     3'h6: Operation = 4'd04;    //OR (e sua versão imediata)

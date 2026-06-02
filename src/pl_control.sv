@@ -42,6 +42,8 @@ module pl_control (
     localparam LOAD   = 7'b0000011;
     localparam STORE  = 7'b0100011;
     localparam BRANCH = 7'b1100011;
+    localparam JALR = 7'b1100111;
+    localparam JAL = 7'b1101111;
 
     always_comb begin
         ALUSrc   = 1'b0;
@@ -63,7 +65,7 @@ module pl_control (
                 ALUSrc   = 1'b1;
                 MemtoReg = 1'b0;
                 RegWrite = 1'b1;
-                ALUOp    = 2'b11;
+                ALUOp    = 2'b10; // mudei para 10 porque, no final das contas, estamos tratando operadores aritméticos e lógicos I-TYPE no mesmo lugar do R-TYPE
             end
             LOAD: begin
                 ALUSrc   = 1'b1;
@@ -80,6 +82,18 @@ module pl_control (
             BRANCH: begin
                 Branch   = 1'b1;
                 ALUOp    = 2'b01;
+            end
+            JALR: begin
+                Branch   = 1'b1;
+                ALUOp    = 2'b10; // tô colocando 10 porque o JALR é I-TYPE
+                RegWrite = 1'b1;
+                ALUSrc   = 1'b1; // o JALR usa um imediato
+            end
+            JAL: begin
+                Branch   = 1'b1;
+                ALUOp    = 2'b11; // aqui eu vou usar o 11 para tratar o JAL
+                RegWrite = 1'b1;
+                ALUSrc   = 1'b1; // O JAL usa um imediato
             end
             default: ; // sinais permanecem em zero (seguro)
         endcase
