@@ -18,6 +18,7 @@ module pl_dmem (
     input  logic        MemWrite,
     input  logic [7:0]  addr,
     input  logic [31:0] WriteData,
+    input  logic [2:0]  funct3,
     output logic [31:0] ReadData
 );
 
@@ -30,10 +31,28 @@ module pl_dmem (
     end
     // synthesis translate_on
 
+    //STORES
     always@(posedge clk) begin
-        if (MemWrite) ram[addr] <= WriteData;
+        if (MemWrite) begin
+            case (funct3)
+                3'h00: ram[addr][7:0] <= WriteData[7:0];   // SB
+                3'h01: ram[addr][15:0] <= WriteData[15:0]; // SH
+                3'h02: ram[addr] <= WriteData;             // SW
+                default: ram[addr] <= WriteData;
+            endcase
+        end
     end
 
-    assign ReadData = ram[addr];
+    //LOADS
+    always_comb begin
+        case (funct3)
+            3'd00:   ReadData = {{24{ram[addr][7]}}, ram[addr][7:0]};   //LB
+            3'd04:   ReadData = {24'b0, ram[addr][7:0]};              //LBU
+            3'd01:   ReadData = {{16{ram[addr][15]}}, ram[addr][15:0]}; //LH
+            3'd05:   ReadData = {16'b0, ram[addr][15:0]};             //LHU
+            3'd02:   ReadData = ram[addr];                            //LW
+            default: ReadData = ram[addr];
+        endcase
+    end
 
 endmodule
