@@ -65,7 +65,7 @@ module pl_control (
                 ALUSrc   = 1'b1;
                 MemtoReg = 1'b0;
                 RegWrite = 1'b1;
-                ALUOp    = 2'b10; // mudei para 10 porque, no final das contas, estamos tratando operadores aritméticos e lógicos I-TYPE no mesmo lugar do R-TYPE
+                ALUOp    = 2'b11; // 11 para que possamos saber quando temos um "addi"
             end
             LOAD: begin
                 ALUSrc   = 1'b1;
