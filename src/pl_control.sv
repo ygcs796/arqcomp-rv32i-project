@@ -34,7 +34,10 @@ module pl_control (
     output logic       MemRead,
     output logic       MemWrite,
     output logic       Branch,
-    output logic [1:0] ALUOp
+    output logic [1:0] ALUOp,
+    // sinais jal/jalr
+    output logic       Jump,
+    output logic       JumpReg,
 );
 
     localparam R_TYPE = 7'b0110011;
@@ -53,6 +56,9 @@ module pl_control (
         MemWrite = 1'b0;
         Branch   = 1'b0;
         ALUOp    = 2'b00;
+
+        Jump   = 1'b0;
+        JumpReg = 1'b0;
 
         case (Opcode)
             R_TYPE: begin
@@ -94,6 +100,7 @@ module pl_control (
                 ALUOp    = 2'b11; // aqui eu vou usar o 11 para tratar o JAL
                 RegWrite = 1'b1;
                 ALUSrc   = 1'b1; // O JAL usa um imediato
+                Jump     = 1'b1 // XX
             end
             default: ; // sinais permanecem em zero (seguro)
         endcase
