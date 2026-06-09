@@ -52,6 +52,7 @@ module pl_cpu (
     logic [6:0] funct7_ex;
     logic [1:0] aluop_ex;
     logic [3:0] alu_cc;
+    logic [1:0] ResultSrc; // XX
 
     // -------------------------------------------------------------------------
     // Unidade de controle principal (estagio ID)
@@ -62,6 +63,7 @@ module pl_cpu (
         .MemtoReg (MemtoReg),
         .RegWrite (RegWrite),
         .MemRead  (MemRead),
+        .ResultSrc(ResultSrc), // XX
         .MemWrite (MemWrite),
         .Branch   (Branch),
         .ALUOp    (ALUOp)
@@ -90,6 +92,7 @@ module pl_cpu (
         .MemWrite     (MemWrite),
         .Branch       (Branch),
         .ALUOp        (ALUOp),
+        .ResultSrc     (ResultSrc), // XX
         .ALU_CC       (alu_cc),
         .Opcode       (opcode),
         .Funct3_EX    (funct3_ex),

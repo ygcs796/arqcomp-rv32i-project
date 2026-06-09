@@ -39,6 +39,7 @@ package pl_pipe_pkg;
         logic [2:0]  funct3;
         logic [6:0]  funct7;
         logic [31:0] pc_plus4; // XX
+        logic [1:0] result_src; // XX
     } id_ex_t;
 
     // ---- EX/MEM -------------------------------------------------------------
@@ -54,6 +55,7 @@ package pl_pipe_pkg;
         logic [4:0]  rd;
         logic [2:0]  funct3;
         logic [31:0] pc_plus4; // XX
+        logic [1:0] result_src; // XX
     } ex_mem_t;
 
     // ---- MEM/WB -------------------------------------------------------------
@@ -66,6 +68,7 @@ package pl_pipe_pkg;
         logic [31:0] read_data;   // dado lido da memoria (LW)
         logic [4:0]  rd;
         logic [31:0] pc_plus4; // XX
+        logic [1:0] result_src; // XX
     } mem_wb_t;
 
 endpackage

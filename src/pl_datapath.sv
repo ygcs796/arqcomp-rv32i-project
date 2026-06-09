@@ -45,6 +45,7 @@ module pl_datapath (
     output logic [2:0]  Funct3_EX,    // funct3 do estagio EX (para pl_alu_ctrl)
     output logic [6:0]  Funct7_EX,    // funct7 do estagio EX (para pl_alu_ctrl)
     output logic [1:0]  ALUOp_EX,     // ALUOp do estagio EX  (para pl_alu_ctrl)
+    input logic [1:0] ResultSrc, // XX
 
     output logic [31:0] PC,           // PC atual (testbench / debug)
 
@@ -154,7 +155,15 @@ module pl_datapath (
     );
 
     // Dado de write-back (mux WB): usado tambem pelo forwarding MEM/WB->EX
-    assign wb_data = mem_wb.mem_to_reg ? mem_wb.read_data : mem_wb.alu_result;
+    // esse mux foi alterado usando um sinal novo para poder implementar o jal e o jalr
+    always_comb begin // XX
+        case (mem_wb.result_src)
+            2'b00: wb_data = mem_wb.alu_result;
+            2'b01: wb_data = mem_wb.read_data;
+            2'b10: wb_data = mem_wb.pc_plus4;
+            default: wb_data = 32'b0;
+        endcase
+    end
 
     pl_regfile regfile (
         .clk       (clk),
@@ -199,6 +208,7 @@ module pl_datapath (
             id_ex.funct3     <= 3'b0;
             id_ex.funct7     <= 7'b0;
             id_ex.pc_plus4 <= 32'b0; // XX 
+            id_ex.result_src <= 2'b00; // XX
         end else if (stall || pc_src) begin    // NOP sincrono: load-use ou branch
             id_ex.alu_src    <= 1'b0;
             id_ex.mem_to_reg <= 1'b0;
@@ -217,6 +227,7 @@ module pl_datapath (
             id_ex.funct3     <= 3'b0;
             id_ex.funct7     <= 7'b0;
             id_ex.pc_plus4 <= 32'b0; // XX
+            id_ex.result_src <= 2'b00; // XX
         end else begin
             id_ex.alu_src    <= ALUSrc;
             id_ex.mem_to_reg <= MemtoReg;
@@ -235,6 +246,7 @@ module pl_datapath (
             id_ex.funct3     <= if_id.instr[14:12];
             id_ex.funct7     <= if_id.instr[31:25];
             id_ex.pc_plus4 <= if_id.pc_plus4; // XX
+            id_ex.result_src <= ResultSrc; // XX
         end
     end
 
@@ -304,6 +316,7 @@ module pl_datapath (
             ex_mem.rd          <= 5'b0;
             ex_mem.funct3      <= 3'b0;
             ex_mem.pc_plus4 <= 32'b0; // XX
+            ex_mem.result_src <= 2'b00; // XX
         end else begin
             ex_mem.mem_to_reg  <= id_ex.mem_to_reg;
             ex_mem.reg_write   <= id_ex.reg_write;
@@ -314,6 +327,7 @@ module pl_datapath (
             ex_mem.rd          <= id_ex.rd;
             ex_mem.funct3      <= id_ex.funct3;
             ex_mem.pc_plus4 <= id_ex.pc_plus4; // XX
+            ex_mem.result_src <= id_ex.result_src; // XX
         end
     end
 
@@ -365,6 +379,7 @@ module pl_datapath (
             mem_wb.read_data  <= 32'b0;
             mem_wb.rd         <= 5'b0;
             mem_wb.pc_plus4 <= 32'b0; // XX
+            mem_wb.result_src <= 2'b00; // XX
         end else begin
             mem_wb.mem_to_reg <= ex_mem.mem_to_reg;
             mem_wb.reg_write  <= ex_mem.reg_write;
@@ -372,6 +387,7 @@ module pl_datapath (
             mem_wb.read_data  <= mem_read_data;
             mem_wb.rd         <= ex_mem.rd;
             mem_wb.pc_plus4 <= ex_mem.pc_plus4; // XX
+            mem_wb.result_src <= ex_mem.result_src; // XX
         end
     end
 

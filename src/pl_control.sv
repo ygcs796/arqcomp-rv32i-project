@@ -34,7 +34,8 @@ module pl_control (
     output logic       MemRead,
     output logic       MemWrite,
     output logic       Branch,
-    output logic [1:0] ALUOp
+    output logic [1:0] ALUOp,
+    output logic [1:0] ResultSrc // XX
 );
 
     localparam R_TYPE = 7'b0110011;
@@ -53,6 +54,7 @@ module pl_control (
         MemWrite = 1'b0;
         Branch   = 1'b0;
         ALUOp    = 2'b00;
+        ResultSrc = 2'b00; // XX
 
         case (Opcode)
             R_TYPE: begin
@@ -73,6 +75,7 @@ module pl_control (
                 RegWrite = 1'b1;
                 MemRead  = 1'b1;
                 ALUOp    = 2'b00;
+                ResultSrc = 2'b01; // XX
             end
             STORE: begin
                 ALUSrc   = 1'b1;
@@ -84,16 +87,18 @@ module pl_control (
                 ALUOp    = 2'b01;
             end
             JALR: begin
-                Branch   = 1'b1;
+                //Branch   = 1'b1;
                 ALUOp    = 2'b10; // tô colocando 10 porque o JALR é I-TYPE
                 RegWrite = 1'b1;
                 ALUSrc   = 1'b1; // o JALR usa um imediato
+                ResultSrc = 2'b10; // XX
             end
             JAL: begin
-                Branch   = 1'b1;
+                //Branch   = 1'b1;
                 ALUOp    = 2'b11; // aqui eu vou usar o 11 para tratar o JAL
                 RegWrite = 1'b1;
                 ALUSrc   = 1'b1; // O JAL usa um imediato
+                ResultSrc = 2'b10; // XX
             end
             default: ; // sinais permanecem em zero (seguro)
         endcase
