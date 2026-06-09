@@ -126,12 +126,15 @@ module pl_datapath (
         if (!rst_n) begin                    // reset assicrono (unico sinal na lista)
             if_id.pc    <= 32'b0;
             if_id.instr <= 32'b0;
+            if_id.pc_plus4 <= 32'b0; // XX
         end else if (pc_src) begin           // flush sincrono: branch taken
             if_id.pc    <= 32'b0;
             if_id.instr <= 32'b0;
+            if_id.pc_plus4 <= 32'b0; // XX
         end else if (!stall) begin           // avanco normal
             if_id.pc    <= pc_reg;
             if_id.instr <= instr_if;
+            if_id.pc_plus4 <= pc_plus4; // XX
         end
         // else stall: mantido
     end
@@ -195,6 +198,7 @@ module pl_datapath (
             id_ex.imm_ext    <= 32'b0;
             id_ex.funct3     <= 3'b0;
             id_ex.funct7     <= 7'b0;
+            id_ex.pc_plus4 <= 32'b0; // XX 
         end else if (stall || pc_src) begin    // NOP sincrono: load-use ou branch
             id_ex.alu_src    <= 1'b0;
             id_ex.mem_to_reg <= 1'b0;
@@ -212,6 +216,7 @@ module pl_datapath (
             id_ex.imm_ext    <= 32'b0;
             id_ex.funct3     <= 3'b0;
             id_ex.funct7     <= 7'b0;
+            id_ex.pc_plus4 <= 32'b0; // XX
         end else begin
             id_ex.alu_src    <= ALUSrc;
             id_ex.mem_to_reg <= MemtoReg;
@@ -229,6 +234,7 @@ module pl_datapath (
             id_ex.imm_ext    <= imm_ext;
             id_ex.funct3     <= if_id.instr[14:12];
             id_ex.funct7     <= if_id.instr[31:25];
+            id_ex.pc_plus4 <= if_id.pc_plus4; // XX
         end
     end
 
@@ -297,6 +303,7 @@ module pl_datapath (
             ex_mem.write_data  <= 32'b0;
             ex_mem.rd          <= 5'b0;
             ex_mem.funct3      <= 3'b0;
+            ex_mem.pc_plus4 <= 32'b0; // XX
         end else begin
             ex_mem.mem_to_reg  <= id_ex.mem_to_reg;
             ex_mem.reg_write   <= id_ex.reg_write;
@@ -306,6 +313,7 @@ module pl_datapath (
             ex_mem.write_data  <= fwd_srcb;   // rs2 adiantado (para SW/MMIO)
             ex_mem.rd          <= id_ex.rd;
             ex_mem.funct3      <= id_ex.funct3;
+            ex_mem.pc_plus4 <= id_ex.pc_plus4; // XX
         end
     end
 
@@ -356,12 +364,14 @@ module pl_datapath (
             mem_wb.alu_result <= 32'b0;
             mem_wb.read_data  <= 32'b0;
             mem_wb.rd         <= 5'b0;
+            mem_wb.pc_plus4 <= 32'b0; // XX
         end else begin
             mem_wb.mem_to_reg <= ex_mem.mem_to_reg;
             mem_wb.reg_write  <= ex_mem.reg_write;
             mem_wb.alu_result <= ex_mem.alu_result;
             mem_wb.read_data  <= mem_read_data;
             mem_wb.rd         <= ex_mem.rd;
+            mem_wb.pc_plus4 <= ex_mem.pc_plus4; // XX
         end
     end
 
