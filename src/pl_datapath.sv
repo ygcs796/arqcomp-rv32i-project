@@ -339,7 +339,7 @@ module pl_datapath (
     pl_dmem dmem (
         .clk       (clk),
         .MemWrite  (ex_mem.mem_write & ~mmio_sel),
-        .addr      (ex_mem.alu_result[9:2]),
+        .addr      (ex_mem.alu_result),
         .WriteData (ex_mem.write_data),
         .funct3    (ex_mem.funct3),
         .ReadData  (dmem_rd)
