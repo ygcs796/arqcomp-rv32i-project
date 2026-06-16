@@ -47,6 +47,7 @@ module pl_cpu (
 
     logic       ALUSrc, MemtoReg, RegWrite, MemRead, MemWrite, Branch;
     logic [1:0] ALUOp;
+    logic [1:0] Utype
 
     logic [2:0] funct3_ex;
     logic [6:0] funct7_ex;
@@ -67,6 +68,7 @@ module pl_cpu (
         .MemWrite (MemWrite),
         .Branch   (Branch),
         .ALUOp    (ALUOp)
+        .Utype    (Utype)
     );
 
     // -------------------------------------------------------------------------
@@ -111,6 +113,7 @@ module pl_cpu (
         .mem_wr_en    (mem_wr_en),
         .mem_wr_addr  (mem_wr_addr),
         .mem_wr_data  (mem_wr_data)
+        .Utype (Utype) // novo sinal para indicar se estou usando uma instrução U-Type e qual instrução estou usando (LUI é 01 e AUIPC é 10)
     );
 
 endmodule

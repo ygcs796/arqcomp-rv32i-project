@@ -28,6 +28,7 @@ package pl_pipe_pkg;
         logic        mem_write;
         logic [1:0]  alu_op;
         logic        branch;
+        logic [1:0]  u_type; // vai indicar se quero fazer uma instrução U-Type e qual instrução U-TYPE vou fazer (LUI (01) ou AUIPC(10))
         // dados
         logic [31:0] pc;
         logic [31:0] rd1;       // saida 1 do banco de registradores

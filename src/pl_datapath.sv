@@ -36,6 +36,7 @@ module pl_datapath (
     input  logic        MemWrite,
     input  logic        Branch,
     input  logic [1:0]  ALUOp,
+    input logic  [1:0]  Utype // sinal usado para indicar uma instrução U-Type e qual instrução (LUI é 01 e AUIPC é 10)
 
     // Codigo de operacao da ALU (pl_alu_ctrl, usa campos do estagio EX)
     input  logic [3:0]  ALU_CC,
@@ -209,6 +210,7 @@ module pl_datapath (
             id_ex.funct7     <= 7'b0;
             id_ex.pc_plus4 <= 32'b0; // XX 
             id_ex.result_src <= 2'b00; // XX
+            id_ex.u_type <= 2'b00; // XX
         end else if (stall || pc_src) begin    // NOP sincrono: load-use ou branch
             id_ex.alu_src    <= 1'b0;
             id_ex.mem_to_reg <= 1'b0;
@@ -228,6 +230,7 @@ module pl_datapath (
             id_ex.funct7     <= 7'b0;
             id_ex.pc_plus4 <= 32'b0; // XX
             id_ex.result_src <= 2'b00; // XX
+            id_ex.u_type <= 2'b00; // XX
         end else begin
             id_ex.alu_src    <= ALUSrc;
             id_ex.mem_to_reg <= MemtoReg;
@@ -247,6 +250,7 @@ module pl_datapath (
             id_ex.funct7     <= if_id.instr[31:25];
             id_ex.pc_plus4 <= if_id.pc_plus4; // XX
             id_ex.result_src <= ResultSrc; // XX
+            id_ex.u_type <= Utype
         end
     end
 

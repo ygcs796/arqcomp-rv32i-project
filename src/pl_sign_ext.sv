@@ -7,6 +7,7 @@
 //   S-type (sw)  : imm[11:5]  = inst[31:25], imm[4:0] = inst[11:7]
 //   B-type (beq) : imm[12]=inst[31], imm[11]=inst[7], imm[10:5]=inst[30:25],
 //                  imm[4:1]=inst[11:8], imm[0]=0
+//   U-TYPE (lui e auipc)   : imm[31:12] = inst[31:12]
 // =============================================================================
 
 `timescale 1ns / 1ps
@@ -21,6 +22,8 @@ module pl_sign_ext (
     localparam STORE  = 7'b0100011;
     localparam BRANCH = 7'b1100011;
     localparam JAL    = 7'b1101111;
+    localparam LUI = 7'b0110111;
+    localparam AUIPC = 7'b0010111;
 
     always_comb begin
         case (Instr[6:0])
@@ -34,6 +37,7 @@ module pl_sign_ext (
                                Instr[30:25], Instr[11:8], 1'b0};
             JAL:    ImmExt = {{19{Instr[31]}}, Instr[31], Instr[19:12],
                             Instr[20], Instr[30:11], 1'b0}; // formato baseado no arquivo do classroom
+            LUI, AUIPC:    ImmExt = {Instr[31:12], 12'b0} // verificar se está correto
             default: ImmExt = 32'b0;
         endcase
     end
