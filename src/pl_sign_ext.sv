@@ -26,7 +26,7 @@ module pl_sign_ext (
     localparam AUIPC = 7'b0010111;
 
     always_comb begin
-        case (Instr[6:0])
+        case (Instr[6:0]) // opcode
             ARLOG:  ImmExt = {{20{Instr[31]}}, Instr[31:20]};
             
             LOAD:   ImmExt = {{20{Instr[31]}}, Instr[31:20]};
