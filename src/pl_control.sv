@@ -107,7 +107,7 @@ module pl_control (
             LUI: begin
                 ALUSrc = 1'b1;
                 RegWrite = 1'b1;
-                AluOP = 2'b11; // vou indicar ele como I-TYPE
+                AluOP = 2'b00; // vou indicar ele como I-TYPE
                 Utype = 2'b01; // vou indicar para o resto do processador que eu quero fazer um LUI
             end
             AUIPC: begin
