@@ -47,8 +47,7 @@ module pl_cpu (
 
     logic       ALUSrc, MemtoReg, RegWrite, MemRead, MemWrite, Branch;
     logic [1:0] ALUOp;
-    logic [1:0] Utype
-
+    logic [1:0] Utype;
     logic [2:0] funct3_ex;
     logic [6:0] funct7_ex;
     logic [1:0] aluop_ex;

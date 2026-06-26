@@ -39,7 +39,7 @@ module pl_datapath (
     input logic  [1:0]  Utype // sinal usado para indicar uma instrução U-Type e qual instrução (LUI é 01 e AUIPC é 10)
 
     // Codigo de operacao da ALU (pl_alu_ctrl, usa campos do estagio EX)
-    input  logic [3:0]  ALU_CC,
+    input logic [3:0]  ALU_CC,
 
     // Campos realimentados ao pl_cpu para controle e ALU ctrl
     output logic [6:0]  Opcode,       // opcode do estagio ID (para pl_control)

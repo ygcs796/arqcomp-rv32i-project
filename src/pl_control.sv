@@ -107,13 +107,13 @@ module pl_control (
             LUI: begin
                 ALUSrc = 1'b1;
                 RegWrite = 1'b1;
-                AluOP = 2'b00; // vou indicar ele como I-TYPE
+                ALUOp = 2'b00; // vou indicar ele como I-TYPE
                 Utype = 2'b01; // vou indicar para o resto do processador que eu quero fazer um LUI
             end
             AUIPC: begin
                 ALUSrc = 1'b1;
                 RegWrite = 1'b1;
-                AluOP = 2'b00; // vou indicar ele como se fosse load/store porque lá ele aponta para uma soma (que é o que eu quero fazer)
+                ALUOp = 2'b00; // vou indicar ele como se fosse load/store porque lá ele aponta para uma soma (que é o que eu quero fazer)
                 Utype = 2'b10; // vou indicar para o resto do processador que eu quero fazer um AUIPC
             end
             default: ; // sinais permanecem em zero (seguro)
