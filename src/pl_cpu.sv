@@ -67,7 +67,7 @@ module pl_cpu (
         .ResultSrc(ResultSrc), // XX
         .MemWrite (MemWrite),
         .Branch   (Branch),
-        .ALUOp    (ALUOp)
+        .ALUOp    (ALUOp),
         .Utype    (Utype)
     );
 
@@ -112,7 +112,7 @@ module pl_cpu (
         .wb_reg_data  (wb_reg_data),
         .mem_wr_en    (mem_wr_en),
         .mem_wr_addr  (mem_wr_addr),
-        .mem_wr_data  (mem_wr_data)
+        .mem_wr_data  (mem_wr_data),
         .Utype (Utype) // novo sinal para indicar se estou usando uma instrução U-Type e qual instrução estou usando (LUI é 01 e AUIPC é 10)
     );
 

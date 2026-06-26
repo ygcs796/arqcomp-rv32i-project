@@ -24,7 +24,7 @@ module pl_alu_ctrl (
 
     always_comb begin
         case (ALUOp)
-            2'b00: Operation = 4'd01;   // Load / Store -> ADD
+            2'b00: Operation = 4'd01;   // Load / Store / lui / auipc -> ADD
 
             2'b01: begin
                 case (Funct3)

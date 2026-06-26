@@ -21,8 +21,8 @@ module pl_dmem (
     input  logic [2:0]  funct3,
     output logic [31:0] ReadData
 );
-    logic [3:0] half_offset;
-    logic [3:0] byte_offset;
+    logic [4:0] half_offset;
+    logic [4:0] byte_offset;
     
     (* ram_init_file = "data.mif" *) logic [31:0] ram [0:255];
 
@@ -55,11 +55,11 @@ module pl_dmem (
     //LOADS
     always_comb begin
         case (funct3)
-            3'd00:   ReadData = {{24{ram[addr][byte_offset + 7]}}, ram[addr[9:2]][byte_offset +: 8]};    //LB
-            3'd04:   ReadData = {24'b0, ram[addr[9:2]][byte_offset +: 8]};                 //LBU
-            3'd01:   ReadData = {{16{ram[addr][half_offset + 15]}}, ram[addr[9:2]][half_offset +: 16]};  //LH
-            3'd05:   ReadData = {16'b0, ram[addr[9:2]][half_offset +: 16]};                //LHU
-            3'd02:   ReadData = ram[addr[9:2]];                                       //LW
+            3'd00:   ReadData = {{24{ram[addr[9:2]][byte_offset +  7]}}, ram[addr[9:2]][byte_offset +:  8]};    //LB
+            3'd01:   ReadData = {{16{ram[addr[9:2]][half_offset + 15]}}, ram[addr[9:2]][half_offset +: 16]};    //LH
+            3'd04:   ReadData = {24'b0, ram[addr[9:2]][byte_offset +:  8]};                                     //LBU
+            3'd05:   ReadData = {16'b0, ram[addr[9:2]][half_offset +: 16]};                                     //LHU
+            3'd02:   ReadData = ram[addr[9:2]];                                                                 //LW
             default: ReadData = ram[addr[9:2]];
         endcase
     end

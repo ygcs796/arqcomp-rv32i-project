@@ -35,7 +35,7 @@ module pl_control (
     output logic       MemWrite,
     output logic       Branch,
     output logic [1:0] ALUOp,
-    output logic [1:0] ResultSrc // XX
+    output logic [1:0] ResultSrc, // XX
     output logic [1:0] Utype
 );
 
@@ -58,7 +58,7 @@ module pl_control (
         Branch   = 1'b0;
         ALUOp    = 2'b00;
         ResultSrc = 2'b00; // XX
-        Utype     = 2'b0; // novo sinal para indicar operações U-TYPE
+        Utype     = 2'b00; // novo sinal para indicar operações U-TYPE
 
         case (Opcode)
             R_TYPE: begin
@@ -95,7 +95,7 @@ module pl_control (
                 ALUOp    = 2'b10; // tô colocando 10 porque o JALR é I-TYPE
                 RegWrite = 1'b1;
                 ALUSrc   = 1'b1; // o JALR usa um imediato
-                ResultSrc = 2'b10; // XX
+                ResultSrc = 2'b11; // XX
             end
             JAL: begin
                 //Branch   = 1'b1;
@@ -113,7 +113,7 @@ module pl_control (
             AUIPC: begin
                 ALUSrc = 1'b1;
                 RegWrite = 1'b1;
-                AluOP = 2'b11; // vou indicar ele como I-TYPE
+                AluOP = 2'b00; // vou indicar ele como se fosse load/store porque lá ele aponta para uma soma (que é o que eu quero fazer)
                 Utype = 2'b10; // vou indicar para o resto do processador que eu quero fazer um AUIPC
             end
             default: ; // sinais permanecem em zero (seguro)

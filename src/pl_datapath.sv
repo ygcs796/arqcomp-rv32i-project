@@ -161,6 +161,7 @@ module pl_datapath (
         case (mem_wb.result_src)
             2'b00: wb_data = mem_wb.alu_result;
             2'b01: wb_data = mem_wb.read_data;
+            2'b11,
             2'b10: wb_data = mem_wb.pc_plus4;
             default: wb_data = 32'b0;
         endcase
@@ -282,6 +283,15 @@ module pl_datapath (
         endcase
     end
 
+    // Mux para instruções U-TYPE
+    always_comb begin
+        case (id_ex.u_type)
+            2'b01:  fwd_srca = 32'b0; // caso seja lui
+            2'b10:  fwd_srca = id_ex.pc; // caso seja auipc
+            default: fwd_srca = fwd_srca // caso não seja nenhum dos dois
+        endcase
+    end 
+
     // Mux de forwarding para SrcB (antes do mux ALUSrc)
     always_comb begin
         case (fwd_b)
@@ -302,9 +312,27 @@ module pl_datapath (
         .Zero      (zero)
     );
 
-    // Branch resolvido no estagio EX (flush 2 instrucoes se taken)
+    /* Branch resolvido no estagio EX (flush 2 instrucoes se taken)
     assign branch_target = id_ex.pc + id_ex.imm_ext;
-    assign pc_src        = id_ex.branch && zero;
+    assign pc_src        = id_ex.branch && zero;*/
+
+    assign branch_target = (id_ex.result_src == 2'b11) ? alu_result : (id_ex.pc + id_ex.imm_ext);  // XX
+
+    // 2. Lógica Combinacional para o pc_src (Estágio EX)
+    always_comb begin
+        // Condição 1: É um Branch (ex: BEQ) e a condição foi atendida (zero = 1)
+        if (id_ex.branch && zero) begin
+            pc_src = 1'b1;
+        end
+        // Condição 2: É um Jump (JAL ou JALR) vindo do estágio EX
+        else if (id_ex.result_src == 2'b10 || id_ex.result_src == 2'b11) begin
+            pc_src = 1'b1;
+        end
+        // Condição Padrão: Não pula, segue fluxo normal (PC + 4)
+        else begin
+            pc_src = 1'b0; // CORRIGIDO: garante que pc_src não cause comportamento indefinido
+        end
+    end
 
     // =========================================================================
     // Registrador EX/MEM
@@ -343,7 +371,7 @@ module pl_datapath (
     pl_dmem dmem (
         .clk       (clk),
         .MemWrite  (ex_mem.mem_write & ~mmio_sel),
-        .addr      (ex_mem.alu_result),
+        .addr      (ex_mem.alu_result[9:0]),
         .WriteData (ex_mem.write_data),
         .funct3    (ex_mem.funct3),
         .ReadData  (dmem_rd)
@@ -395,6 +423,21 @@ module pl_datapath (
         end
     end
 
+    always_comb begin
+        if (mem_wb.result_src == 2'b00) begin
+            wb_data = mem_wb.alu_result;  
+        end
+        else if (mem_wb.result_src == 2'b01) begin
+            wb_data = mem_wb.read_data;   
+        end
+        // AQUI: Se for JAL (2'b10) ou JALR (2'b11), o MUX injeta o PC+4 no barramento de escrita!
+        else if (mem_wb.result_src == 2'b10 || mem_wb.result_src == 2'b11) begin
+            wb_data = mem_wb.pc_plus4;    
+        end
+        else begin
+            wb_data = 32'b0;              
+        end
+    end
     // WB: wb_data = mem_to_reg ? read_data : alu_result  (definido acima, no bloco ID)
 
 endmodule
