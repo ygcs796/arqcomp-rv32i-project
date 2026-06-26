@@ -37,7 +37,7 @@ module pl_sign_ext (
                                Instr[30:25], Instr[11:8], 1'b0};
             JAL:    ImmExt = {{19{Instr[31]}}, Instr[31], Instr[19:12],
                             Instr[20], Instr[30:11], 1'b0}; // formato baseado no arquivo do classroom
-            LUI, AUIPC:    ImmExt = {Instr[31:12], 12'b0} // verificar se está correto
+            LUI, AUIPC:    ImmExt = {Instr[31:12], 12'b0}; // verificar se está correto
             default: ImmExt = 32'b0;
         endcase
     end
