@@ -157,15 +157,15 @@ module pl_datapath (
 
     // Dado de write-back (mux WB): usado tambem pelo forwarding MEM/WB->EX
     // esse mux foi alterado usando um sinal novo para poder implementar o jal e o jalr
-    always_comb begin // XX
-        case (mem_wb.result_src)
-            2'b00: wb_data = mem_wb.alu_result;
-            2'b01: wb_data = mem_wb.read_data;
-            2'b11,
-            2'b10: wb_data = mem_wb.pc_plus4;
-            default: wb_data = 32'b0;
-        endcase
-    end
+    // always_comb begin // XX
+    //     case (mem_wb.result_src)
+    //         2'b00: wb_data = mem_wb.alu_result;
+    //         2'b01: wb_data = mem_wb.read_data;
+    //         2'b11,
+    //         2'b10: wb_data = mem_wb.pc_plus4;
+    //         default: wb_data = 32'b0;
+    //     endcase
+    // end
 
     pl_regfile regfile (
         .clk       (clk),
@@ -251,7 +251,7 @@ module pl_datapath (
             id_ex.funct7     <= if_id.instr[31:25];
             id_ex.pc_plus4 <= if_id.pc_plus4; // XX
             id_ex.result_src <= ResultSrc; // XX
-            id_ex.u_type <= Utype
+            id_ex.u_type <= Utype;
         end
     end
 
@@ -281,17 +281,14 @@ module pl_datapath (
             2'b01:   fwd_srca = wb_data;
             default: fwd_srca = id_ex.rd1;
         endcase
-    end
 
-    // Mux para instruções U-TYPE
-    always_comb begin
         case (id_ex.u_type)
             2'b01:  fwd_srca = 32'b0; // caso seja lui
             2'b10:  fwd_srca = id_ex.pc; // caso seja auipc
-            default: fwd_srca = fwd_srca // caso não seja nenhum dos dois
+            default:; // caso não seja nenhum dos dois
         endcase
-    end 
-
+    end
+    
     // Mux de forwarding para SrcB (antes do mux ALUSrc)
     always_comb begin
         case (fwd_b)
