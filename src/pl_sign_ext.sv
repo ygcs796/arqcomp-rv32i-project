@@ -17,13 +17,14 @@ module pl_sign_ext (
     output logic [31:0] ImmExt
 );
 
-    localparam ARLOG  = 7'b0010011; // Tirando o LOAD
+    localparam ARLOG  = 7'b0010011; 
     localparam LOAD   = 7'b0000011;
     localparam STORE  = 7'b0100011;
     localparam BRANCH = 7'b1100011;
     localparam JAL    = 7'b1101111;
-    localparam LUI = 7'b0110111;
-    localparam AUIPC = 7'b0010111;
+    localparam JALR   = 7'b1100111; 
+    localparam LUI    = 7'b0110111;
+    localparam AUIPC  = 7'b0010111;
 
     always_comb begin
         case (Instr[6:0]) // opcode
@@ -31,13 +32,17 @@ module pl_sign_ext (
             
             LOAD:   ImmExt = {{20{Instr[31]}}, Instr[31:20]};
 
+            JALR:   ImmExt = {{20{Instr[31]}}, Instr[31:20]}; 
+
             STORE:  ImmExt = {{20{Instr[31]}}, Instr[31:25], Instr[11:7]};
 
             BRANCH: ImmExt = {{19{Instr[31]}}, Instr[31], Instr[7],
                                Instr[30:25], Instr[11:8], 1'b0};
-            JAL:    ImmExt = {{19{Instr[31]}}, Instr[31], Instr[19:12],
-                            Instr[20], Instr[30:11], 1'b0}; // formato baseado no arquivo do classroom
-            LUI, AUIPC:    ImmExt = {Instr[31:12], 12'b0}; // verificar se está correto
+            
+            JAL:    ImmExt = {{12{Instr[31]}}, Instr[19:12], Instr[20], Instr[30:21], 1'b0}; 
+            
+            LUI, AUIPC:    ImmExt = {Instr[31:12], 12'b0}; 
+            
             default: ImmExt = 32'b0;
         endcase
     end
