@@ -27,7 +27,8 @@ module pl_mmio (
     input  logic        rst_n,
     input  logic        MemWrite,
     input  logic        MemRead,
-    input  logic [2:0]  addr,        // alu_result[4:2]
+    input  logic [9:0]  addr,
+    input  logic [2:0]  funct3,
     input  logic [31:0] WriteData,
 
     input  logic [17:0] SW,
@@ -99,7 +100,7 @@ module pl_mmio (
             tx_word      <= '0;
             tx_byte_idx  <= '0;
             tx_word_busy <= 1'b0;
-        end else if (MemWrite && (addr == 3'b100) && !tx_word_busy) begin
+        end else if (MemWrite && (funct3 == 3'b010) && (addr[4:2] == 3'b100) && !tx_word_busy) begin
             // CPU escreve nova palavra: latcha e inicia sequenciamento
             tx_word      <= WriteData;
             tx_byte_idx  <= 2'd0;
@@ -133,34 +134,69 @@ module pl_mmio (
             rx_ready <= 1'b0;
         else if (rx_valid)
             rx_ready <= 1'b1;
-        else if (MemRead & (addr == 3'b100))
+        else if (MemRead & (addr[4:2] == 3'b100))
             rx_ready <= 1'b0;
     end
 
     // -------------------------------------------------------------------------
     // Mux de leitura (combinatorial)
     // -------------------------------------------------------------------------
+
+    logic  [4:0] half_offset;
+    logic  [4:0] byte_offset;
+    logic [31:0] ReadWord;
+
+    assign half_offset =   addr[1] << 4;
+    assign byte_offset = addr[1:0] << 3;
+
     always_comb begin
-        case (addr)
-            3'b000:  ReadData = {14'b0, SW};
-            3'b001:  ReadData = {28'b0, KEY};
-            3'b100:  ReadData = {22'b0, (tx_word_busy | tx_busy), rx_ready, rx_data};
-            3'b101:  ReadData = cycle_count;
-            default: ReadData = 32'b0;
+        case (addr[4:2])
+            3'b000:  ReadWord = {14'b0,  SW};
+            3'b001:  ReadWord = {28'b0, KEY};
+            3'b100:  ReadWord = {22'b0, (tx_word_busy | tx_busy), rx_ready, rx_data};
+            3'b101:  ReadWord = cycle_count;
+            default: ReadWord = 32'b0;
         endcase
     end
+
+    always_comb begin
+        case (funct3)
+            3'd00:   ReadData = {{24{ReadWord[byte_offset +  7]}}, ReadWord[byte_offset +:  8]};    //LB
+            3'd01:   ReadData = {{16{ReadWord[half_offset + 15]}}, ReadWord[half_offset +: 16]};    //LH
+            3'd04:   ReadData = {24'b0, ReadWord[byte_offset +:  8]};                               //LBU
+            3'd05:   ReadData = {16'b0, ReadWord[half_offset +: 16]};                               //LHU
+            3'd02:   ReadData = ReadWord;                                                           //LW
+            default: ReadData = ReadWord;
+        endcase
+    end
+
 
     // -------------------------------------------------------------------------
     // Registradores de LED (escrita sincrona)
     // -------------------------------------------------------------------------
+
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             LEDR <= 18'b0;
             LEDG <=  9'b0;
         end else if (MemWrite) begin
-            case (addr)
-                3'b010: LEDR <= WriteData[17:0];
-                3'b011: LEDG <= WriteData[8:0];
+            case (addr[4:2])
+                3'b010: begin
+                    case (funct3)
+                        3'd00: LEDR[byte_offset +: 8] <= WriteData[ 7:0];  // SB
+                        3'd01: LEDR[half_offset +:16] <= WriteData[15:0];  // SH
+                        3'd02: LEDR <= WriteData[17:0];                    // SW
+                        default: ;
+                    endcase 
+                end
+                3'b011: begin
+                    case (funct3)
+                        3'd00: LEDG[byte_offset +: 8] <= WriteData[ 7:0];  // SB
+                        3'd01: LEDG[half_offset +:16] <= WriteData[15:0];  // SH
+                        3'd02: LEDG <=  WriteData[8:0];                    // SW
+                        default: ;
+                    endcase 
+                end
                 default: ;
             endcase
         end

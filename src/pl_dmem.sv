@@ -32,7 +32,6 @@ module pl_dmem (
         $readmemh("data.hex", ram);
     end
 
-    // synthesis translate_on
     assign half_offset = addr[1] << 4;
     assign byte_offset = addr[1:0] << 3;
 
