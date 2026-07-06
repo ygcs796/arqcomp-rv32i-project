@@ -15,6 +15,7 @@ package pl_pipe_pkg;
     typedef struct packed {
         logic [31:0] pc;
         logic [31:0] instr;
+        logic [31:0] pc_plus4; // XX
     } if_id_t;
 
     // ---- ID/EX --------------------------------------------------------------
@@ -27,6 +28,7 @@ package pl_pipe_pkg;
         logic        mem_write;
         logic [1:0]  alu_op;
         logic        branch;
+        logic [1:0]  u_type; // vai indicar se quero fazer uma instrução U-Type e qual instrução U-TYPE vou fazer (LUI (01) ou AUIPC(10))
         // dados
         logic [31:0] pc;
         logic [31:0] rd1;       // saida 1 do banco de registradores
@@ -37,6 +39,8 @@ package pl_pipe_pkg;
         logic [31:0] imm_ext;   // imediato com extensao de sinal
         logic [2:0]  funct3;
         logic [6:0]  funct7;
+        logic [31:0] pc_plus4; // XX
+        logic [1:0] result_src; // XX
     } id_ex_t;
 
     // ---- EX/MEM -------------------------------------------------------------
@@ -51,6 +55,8 @@ package pl_pipe_pkg;
         logic [31:0] write_data;  // valor de rs2 apos forwarding (para SW)
         logic [4:0]  rd;
         logic [2:0]  funct3;
+        logic [31:0] pc_plus4; // XX
+        logic [1:0] result_src; // XX
     } ex_mem_t;
 
     // ---- MEM/WB -------------------------------------------------------------
@@ -62,6 +68,8 @@ package pl_pipe_pkg;
         logic [31:0] alu_result;
         logic [31:0] read_data;   // dado lido da memoria (LW)
         logic [4:0]  rd;
+        logic [31:0] pc_plus4; // XX
+        logic [1:0] result_src; // XX
     } mem_wb_t;
 
 endpackage

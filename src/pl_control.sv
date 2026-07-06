@@ -12,16 +12,16 @@
 //   B-type  (1100011): beq
 //
 // Tabela de sinais de controle:
-//   Sinal     | R-type | lw | sw | beq
-//   ----------|--------|----|----|-----
-//   ALUSrc    |   0    |  1 |  1 |  0    0=reg, 1=imm
-//   MemtoReg  |   0    |  1 |  - |  -    0=ALU, 1=mem
-//   RegWrite  |   1    |  1 |  0 |  0
-//   MemRead   |   0    |  1 |  0 |  0
-//   MemWrite  |   0    |  0 |  1 |  0
-//   Branch    |   0    |  0 |  0 |  1
-//   ALUOp[1]  |   1    |  0 |  0 |  0
-//   ALUOp[0]  |   0    |  0 |  0 |  1
+//   Sinal     | R-type | lw | sw | beq| U-Type |
+//   ----------|--------|----|----|----|        |
+//   ALUSrc    |   0    |  1 |  1 |  0 |   1    | 0=reg, 1=imm
+//   MemtoReg  |   0    |  1 |  - |  - |   0    | 0=ALU, 1=mem
+//   RegWrite  |   1    |  1 |  0 |  0 |   1    |
+//   MemRead   |   0    |  1 |  0 |  0 |   0    |
+//   MemWrite  |   0    |  0 |  1 |  0 |   0    |
+//   Branch    |   0    |  0 |  0 |  1 |   0    |
+//   ALUOp[1]  |   1    |  0 |  0 |  0 |   def    |
+//   ALUOp[0]  |   0    |  0 |  0 |  1 |   def    |
 // =============================================================================
 
 `timescale 1ns / 1ps
@@ -34,7 +34,9 @@ module pl_control (
     output logic       MemRead,
     output logic       MemWrite,
     output logic       Branch,
-    output logic [1:0] ALUOp
+    output logic [1:0] ALUOp,
+    output logic [1:0] ResultSrc, // XX
+    output logic [1:0] Utype
 );
 
     localparam R_TYPE = 7'b0110011;
@@ -42,6 +44,10 @@ module pl_control (
     localparam LOAD   = 7'b0000011;
     localparam STORE  = 7'b0100011;
     localparam BRANCH = 7'b1100011;
+    localparam JALR = 7'b1100111;
+    localparam JAL = 7'b1101111;
+    localparam LUI = 7'b0110111;
+    localparam AUIPC = 7'b0010111;
 
     always_comb begin
         ALUSrc   = 1'b0;
@@ -51,6 +57,8 @@ module pl_control (
         MemWrite = 1'b0;
         Branch   = 1'b0;
         ALUOp    = 2'b00;
+        ResultSrc = 2'b00; // XX
+        Utype     = 2'b00; // novo sinal para indicar operações U-TYPE
 
         case (Opcode)
             R_TYPE: begin
@@ -63,7 +71,7 @@ module pl_control (
                 ALUSrc   = 1'b1;
                 MemtoReg = 1'b0;
                 RegWrite = 1'b1;
-                ALUOp    = 2'b11;
+                ALUOp    = 2'b11; // 11 para que possamos saber quando temos um "addi"
             end
             LOAD: begin
                 ALUSrc   = 1'b1;
@@ -71,6 +79,7 @@ module pl_control (
                 RegWrite = 1'b1;
                 MemRead  = 1'b1;
                 ALUOp    = 2'b00;
+                ResultSrc = 2'b01; // XX
             end
             STORE: begin
                 ALUSrc   = 1'b1;
@@ -80,6 +89,32 @@ module pl_control (
             BRANCH: begin
                 Branch   = 1'b1;
                 ALUOp    = 2'b01;
+            end
+            JALR: begin
+                //Branch   = 1'b1;
+                ALUOp    = 2'b10; // tô colocando 10 porque o JALR é I-TYPE
+                RegWrite = 1'b1;
+                ALUSrc   = 1'b1; // o JALR usa um imediato
+                ResultSrc = 2'b11; // XX
+            end
+            JAL: begin
+                //Branch   = 1'b1;
+                ALUOp    = 2'b11; // aqui eu vou usar o 11 para tratar o JAL
+                RegWrite = 1'b1;
+                ALUSrc   = 1'b1; // O JAL usa um imediato
+                ResultSrc = 2'b10; // XX
+            end
+            LUI: begin
+                ALUSrc = 1'b1;
+                RegWrite = 1'b1;
+                ALUOp = 2'b00; // vou indicar ele como I-TYPE
+                Utype = 2'b01; // vou indicar para o resto do processador que eu quero fazer um LUI
+            end
+            AUIPC: begin
+                ALUSrc = 1'b1;
+                RegWrite = 1'b1;
+                ALUOp = 2'b00; // vou indicar ele como se fosse load/store porque lá ele aponta para uma soma (que é o que eu quero fazer)
+                Utype = 2'b10; // vou indicar para o resto do processador que eu quero fazer um AUIPC
             end
             default: ; // sinais permanecem em zero (seguro)
         endcase

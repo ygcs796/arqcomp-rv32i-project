@@ -43,6 +43,14 @@ module pl_mmio (
 );
 
     // -------------------------------------------------------------------------
+    // Instancia da UART
+    // -------------------------------------------------------------------------
+    logic       tx_write;
+    logic       tx_busy;
+    logic [7:0] rx_data;
+    logic       rx_valid;
+
+    // -------------------------------------------------------------------------
     // Sequenciador de transmissao de 4 bytes (little-endian)
     //
     // Quando o CPU executa SW para 0x410, os 4 bytes da palavra sao enviados
@@ -50,20 +58,10 @@ module pl_mmio (
     // tx_word_busy permanece alto enquanto houver bytes pendentes.
     // O CPU deve aguardar tx_busy == 0 (bit 9 de LW 0x410) antes de nova SW.
     // -------------------------------------------------------------------------
-    
     logic [31:0] tx_word;       // palavra de 32 bits em transmissao
     logic [1:0]  tx_byte_idx;   // indice do byte atual (0=LSB, 3=MSB)
     logic        tx_word_busy;  // alto enquanto houver bytes a enviar
     logic [7:0]  tx_byte;       // byte corrente entregue a UART
-
-    // -------------------------------------------------------------------------
-    // Instancia da UART
-    // -------------------------------------------------------------------------
-    
-    logic       tx_write;
-    logic       tx_busy;
-    logic [7:0] rx_data;
-    logic       rx_valid;
 
     pl_uart #(
         .CLK_HZ (50_000_000),
@@ -80,14 +78,13 @@ module pl_mmio (
         .RXD      (UART_RXD)
     );
 
-    
-
     always_comb begin
         case (tx_byte_idx)
             2'd0: tx_byte = tx_word[7:0];
             2'd1: tx_byte = tx_word[15:8];
             2'd2: tx_byte = tx_word[23:16];
             2'd3: tx_byte = tx_word[31:24];
+            default: ;
         endcase
     end
 
